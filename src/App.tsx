@@ -298,7 +298,7 @@ function App() {
                     ) : (
                       <>
                         Get Early Access
-                        <ArrowRight className="w-4 h-4" />
+                        <ArrowRight className="w-4 h-4 text-blue-600" />
                       </>
                     )}
                   </span>
