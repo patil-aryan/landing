@@ -65,7 +65,7 @@ function App() {
             <div className="flex items-center gap-4 sm:gap-6">
               <a href="#features" className="text-gray-600 text-sm sm:text-base">Features</a>
               <button className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl text-xs sm:text-sm">
-                Early Access
+              <a href="#signup-section" className="text-sm sm:text-base">Early Access</a>
               </button>
             </div>
           </div>
@@ -128,7 +128,7 @@ function App() {
                       ) : (
                         <>
                           Get Early Access
-                          <ArrowRight className="w-4 h-4" />
+                          <ArrowRight className="w-4 h-4" href='#' />
                         </>
                       )}
                     </span>
@@ -136,18 +136,7 @@ function App() {
                 </form>
               </div>
 
-              <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-8 mt-6">
-                {[
-                  'Instant Access',
-                  'Free for Beta Users',
-                  'Cancel Anytime'
-                ].map((text, i) => (
-                  <div key={i} className="flex items-center gap-2 text-gray-600 text-xs sm:text-sm">
-                    <Sparkles className="w-4 h-4 text-blue-600" />
-                    {text}
-                  </div>
-                ))}
-              </div>
+              
             </div>
           
             <div className="grid grid-cols-1 md:grid-cols-3 gap-5 sm:gap-6 md:gap-8 mb-0 max-w-5xl mx-auto px-4 sm:px-6">
@@ -306,18 +295,7 @@ function App() {
               </form>
             </div>
 
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-8 mt-10">
-              {[
-                'Instant Access',
-                'Free for Beta Users',
-                'Cancel Anytime'
-              ].map((text, i) => (
-                <div key={i} className="flex items-center gap-2 text-blue-100/90 text-xs sm:text-sm">
-                  <Sparkles className="w-4 h-4" />
-                  {text}
-                </div>
-              ))}
-            </div>
+            
           </div>
         </div>
       </div>
