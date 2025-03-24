@@ -28,8 +28,11 @@ function App() {
             </div>
             <div className="flex items-center gap-4 sm:gap-6">
               <a href="#features" className="text-gray-600 text-sm sm:text-base">Features</a>
-              <button className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl text-xs sm:text-sm">
-              <a href="#signup-section" className="text-sm sm:text-base">Early Access</a>
+              <button 
+                onClick={scrollToSignup}
+                className="bg-gradient-to-r from-blue-600 to-purple-600 hover:opacity-90 transition-opacity text-white px-4 sm:px-5 py-2 sm:py-2.5 rounded-xl text-sm sm:text-base font-medium"
+              >
+                Early Access
               </button>
             </div>
           </div>
