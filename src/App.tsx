@@ -249,7 +249,7 @@ function App() {
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-100 opacity-75"></span>
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-blue-200"></span>
               </span>
-              Limited Beta Access
+              Signup for Beta Access
             </span>
 
             <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-4 sm:mb-6 text-white leading-[1.15] sm:leading-tight px-4 sm:px-0">
