@@ -1,45 +1,9 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Sparkles, Puzzle, ArrowRight, Clock, Database, Timer, MessageSquareMore, FileSearch, Zap } from 'lucide-react';
 import { Toaster, toast } from 'sonner';
-import { supabase } from './lib/supabase';
+import { SubscribeForm } from './components/SubscribeForm';
 
 function App() {
-  const [email, setEmail] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!email) return;
-
-    setIsLoading(true);
-    try {
-      const { data: existingSignup } = await supabase
-        .from('beta_signups')
-        .select('email')
-        .eq('email', email)
-        .single();
-
-      if (existingSignup) {
-        toast.error('This email is already registered for beta access!');
-        return;
-      }
-
-      const { error } = await supabase
-        .from('beta_signups')
-        .insert([{ email, status: 'pending' }]);
-
-      if (error) throw error;
-
-      toast.success('Thanks for signing up! Check your email for confirmation.');
-      setEmail('');
-    } catch (error) {
-      console.error('Error:', error);
-      toast.error('Something went wrong. Please try again.');
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   const scrollToSignup = () => {
     const element = document.querySelector('#signup-section');
     element?.scrollIntoView({ behavior: 'smooth' });
@@ -60,7 +24,7 @@ function App() {
                 <div className="absolute inset-0 bg-blue-600 blur opacity-20 rounded-lg"></div>
                 <Sparkles className="w-6 sm:w-7 h-6 sm:h-7 text-blue-600 relative" />
               </div>
-              <span className="text-lg sm:text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">iPersona</span>
+              <span className="text-lg sm:text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">Lumos</span>
             </div>
             <div className="flex items-center gap-4 sm:gap-6">
               <a href="#features" className="text-gray-600 text-sm sm:text-base">Features</a>
@@ -102,39 +66,7 @@ function App() {
             </p>
 
             <div className="max-w-xl mx-auto mb-8 px-4 sm:px-0">
-              <div className="bg-white/10 backdrop-blur-md p-2 sm:p-3 rounded-2xl border border-white/20">
-                <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-2 sm:gap-3 bg-white/5 rounded-xl p-1.5">
-                  <input
-                    type="email"
-                    placeholder="Enter your work email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="flex-1 px-4 sm:px-6 py-3 sm:py-4 rounded-lg bg-gradient-to-r from-blue-600/10 to-purple-600/10 text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500/30 text-sm sm:text-base w-full"
-                    required
-                  />
-                  <button 
-                    type="submit"
-                    disabled={isLoading}
-                    className={`bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 sm:px-8 py-3 sm:py-4 rounded-lg w-full sm:w-auto ${
-                      isLoading ? 'opacity-70 cursor-not-allowed' : ''
-                    }`}
-                  >
-                    <span className="inline-flex items-center justify-center gap-2 font-semibold">
-                      {isLoading ? (
-                        <div className="flex items-center gap-2">
-                          <span className="h-4 w-4 border-2 border-white border-r-transparent rounded-full animate-spin"></span>
-                          Please wait...
-                        </div>
-                      ) : (
-                        <>
-                          Get Early Access
-                          <ArrowRight className="w-4 h-4" href='#' />
-                        </>
-                      )}
-                    </span>
-                  </button>
-                </form>
-              </div>
+              <SubscribeForm variant="hero" />
 
               
             </div>
@@ -261,39 +193,7 @@ function App() {
               Join forward-thinking innovators shaping the future of strategic decision-making
             </p>
 
-            <div className="bg-white/10 backdrop-blur-md p-2 sm:p-3 rounded-2xl max-w-xl mx-auto border border-white/20">
-              <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-2 sm:gap-3 bg-white/5 rounded-xl p-1.5">
-                <input
-                  type="email"
-                  placeholder="Enter your work email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="flex-1 px-4 sm:px-6 py-3 sm:py-4 rounded-lg bg-white/10 text-white placeholder-blue-200/70 focus:outline-none focus:ring-2 focus:ring-white/30 text-sm sm:text-base w-full"
-                  required
-                />
-                <button 
-                  type="submit"
-                  disabled={isLoading}
-                  className={`bg-white px-6 sm:px-8 py-3 sm:py-4 rounded-lg w-full sm:w-auto ${
-                    isLoading ? 'opacity-70 cursor-not-allowed' : ''
-                  }`}
-                >
-                  <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent font-semibold inline-flex items-center justify-center gap-2">
-                    {isLoading ? (
-                      <div className="flex items-center gap-2">
-                        <span className="h-4 w-4 border-2 border-blue-600 border-r-transparent rounded-full animate-spin"></span>
-                        Please wait...
-                      </div>
-                    ) : (
-                      <>
-                        Get Early Access
-                        <ArrowRight className="w-4 h-4 text-blue-600" />
-                      </>
-                    )}
-                  </span>
-                </button>
-              </form>
-            </div>
+            <SubscribeForm variant="footer" />
 
             
           </div>
