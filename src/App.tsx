@@ -13,19 +13,26 @@ function App() {
     <div className="min-h-screen bg-[#fafafa] relative overflow-hidden">
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_-20%,#4f46e520,transparent_50%)] pointer-events-none"></div>
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_100%,#6366f120,transparent_50%)] pointer-events-none"></div>
-      <Toaster position="top-center" theme="system" closeButton richColors />
+      <Toaster 
+        position="top-center" 
+        theme="dark" 
+        closeButton 
+        richColors
+        toastOptions={{
+        }}
+      />
       
       {/* Navigation */}
       <nav className="fixed top-0 left-0 right-0 z-50">
         <div className="container mx-auto px-4 sm:px-6 py-3 sm:py-4">
           <div className="backdrop-blur-md bg-white/60 rounded-2xl px-4 sm:px-6 py-2.5 sm:py-3 flex justify-between items-center shadow-sm border border-white/20">
-            <div className="flex items-center gap-2 sm:gap-3">
+            <button onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} className="flex items-center gap-2 sm:gap-3">
               <div className="relative">
                 <div className="absolute inset-0 bg-blue-600 blur opacity-20 rounded-lg"></div>
                 <Sparkles className="w-6 sm:w-7 h-6 sm:h-7 text-blue-600 relative" />
               </div>
               <span className="text-lg sm:text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">Lumos</span>
-            </div>
+            </button>
             <div className="flex items-center gap-4 sm:gap-6">
               <a href="#features" className="text-gray-600 text-sm sm:text-base">Features</a>
               <button 

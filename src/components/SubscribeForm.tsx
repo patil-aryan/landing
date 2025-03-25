@@ -2,7 +2,8 @@ import { useState, FormEvent } from 'react';
 import { ArrowRight } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { addSubscriberToMailchimp } from '../lib/mailchimp';
-import type { SubscribeFormData, Subscriber, OrganizationSize } from '../types/subscriber';
+import { toast } from 'sonner';
+import type { SubscribeFormData, Subscriber } from '../types/subscriber';
 
 interface SubscribeFormProps {
   variant?: 'hero' | 'footer';
@@ -14,7 +15,7 @@ export function SubscribeForm({ variant = 'hero' }: SubscribeFormProps) {
     firstName: '',
     jobRole: '',
     organizationSize: undefined,
-    consent: false,
+    consent: true,
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -26,49 +27,101 @@ export function SubscribeForm({ variant = 'hero' }: SubscribeFormProps) {
     setError(null);
 
     try {
-      if (!formData.consent) {
-        throw new Error('Please accept the terms and conditions');
-      }
-
-      // Create subscriber in Supabase
-      const subscriber: Subscriber = {
+      const signupData = {
         email: formData.email,
-        firstName: formData.firstName || undefined,
-        jobRole: formData.jobRole || undefined,
-        organizationSize: formData.organizationSize || undefined,
-        status: 'pending',
+        first_name: formData.firstName,
+        job_role: formData.jobRole,
+        organization_size: formData.organizationSize,
+        status: 'pending'
       };
 
-      const { data: supabaseData, error: supabaseError } = await supabase
-        .from('subscribers')
-        .insert([subscriber])
-        .select()
-        .single();
+      const { error: supabaseError } = await supabase
+        .from('beta_signups')
+        .insert([signupData])
+        .select();
 
-      if (supabaseError) throw supabaseError;
+      if (supabaseError) {
+        if (supabaseError?.message?.includes('violates unique constraint')) {
+          throw new Error('This email is already registered for early access.');
+        }
+        throw new Error('Unable to complete registration. Please try again later.');
+      }
 
-      // Add to Mailchimp list
-      await addSubscriberToMailchimp(subscriber);
+      try {
+        const subscriber: Subscriber = {
+          email: formData.email,
+          first_name: formData.firstName,
+          job_role: formData.jobRole,
+          organization_size: formData.organizationSize,
+          status: 'pending'
+        };
 
+        await addSubscriberToMailchimp(subscriber);
+      } catch {
+        // Even if Mailchimp fails, we've saved to our DB, so don't throw
+      }
+
+      toast.success('Thank you for subscribing!', {
+        duration: 5000,
+        className: variant === 'hero' 
+          ? "bg-gradient-to-r from-blue-100/90 to-purple-100/90 border-2 border-green-500/20 text-gray-900 backdrop-blur" 
+          : "bg-green-500/10 border border-green-500/20 text-white backdrop-blur",
+        description: variant === 'hero'
+          ? <span className="text-white/80">We will update you soon with the beta access.</span>
+          : <span className="text-white/80">We will update you soon with the beta access.</span>,
+      });
       setSuccess(true);
       setFormData({
         email: '',
         firstName: '',
         jobRole: '',
         organizationSize: undefined,
-        consent: false,
+        consent: true,
       });
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred');
+      const errorMessage = err instanceof Error ? err.message : 'An error occurred';
+      toast.error(errorMessage, {
+        duration: 5000,
+        className: variant === 'hero'
+          ? "bg-gradient-to-r from-red-100/90 to-pink-100/90 border-2 border-red-500/20 text-gray-900 backdrop-blur font-medium"
+          : "bg-red-500/10 border border-red-500/20 text-white backdrop-blur",
+        style: variant === 'hero' ? {
+          color: '#B91C1C',
+          fontWeight: 500
+        } : undefined
+      });
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
   };
 
   if (success) {
-    return (
-      <div className="bg-green-50/20 backdrop-blur-md p-4 rounded-lg text-white">
-        <p>Thank you for subscribing! Please check your email to confirm your subscription.</p>
+    return variant === 'hero' ? (
+      <div className="backdrop-blur-xl bg-gradient-to-r from-blue-100/90 to-purple-100/90 p-6 rounded-xl text-gray-900 text-center border-2 border-green-500/20 shadow-lg relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-purple-500/10 animate-pulse"></div>
+        <div className="relative">
+          <div className="flex justify-center mb-3">
+            <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center">
+              <span className="text-2xl">🎉</span>
+            </div>
+          </div>
+          <p className="text-xl font-semibold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">You're on the list!</p>
+          <p className="text-sm text-gray-600 mt-3">We will update you soon with the beta access.</p>
+        </div>
+      </div>
+    ) : (
+      <div className="bg-green-50/20 backdrop-blur-md p-6 rounded-xl text-white text-center relative overflow-hidden">
+        <div className="absolute inset-0 bg-white/5 animate-pulse"></div>
+        <div className="relative">
+          <div className="flex justify-center mb-3">
+            <div className="w-12 h-12 bg-white/20 backdrop-blur-xl rounded-full flex items-center justify-center">
+              <span className="text-2xl">🎉</span>
+            </div>
+          </div>
+          <p className="text-xl font-semibold">You're on the list!</p>
+          <p className="text-sm text-white/80 mt-3">We will update you soon with the beta access.</p>
+        </div>
       </div>
     );
   }
@@ -87,26 +140,24 @@ export function SubscribeForm({ variant = 'hero' }: SubscribeFormProps) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-4 bg-white/5 rounded-xl p-6 max-w-2xl mx-auto w-full">
-      {error && (
-        <div className="p-4 bg-red-50/20 backdrop-blur-md rounded-lg text-white absolute -top-16 left-0 right-0">
-          <p>{error}</p>
+    <form onSubmit={handleSubmit} className="flex flex-col gap-3 bg-white/5 rounded-xl p-4 max-w-2xl mx-auto w-full">
+      {error && variant === 'hero' ? (
+        <div className="p-4 bg-gradient-to-r from-red-100/90 to-pink-100/90 rounded-lg text-gray-900 mb-3 border-2 border-red-500/20">
+          <p className="font-medium flex items-center gap-2">
+            <span className="text-red-600 text-lg">⚠</span>
+            <span className="text-red-700">{error}</span>
+          </p>
+        </div>
+      ) : error && (
+        <div className="p-4 bg-red-500/10 backdrop-blur-md rounded-lg text-white mb-3 border border-red-500/20">
+          <p className="font-medium flex items-center gap-2">
+            <span className="text-red-300">⚠</span>
+            {error}
+          </p>
         </div>
       )}
 
-      <div className="w-full">
-        <input
-          type="email"
-          id="email"
-          required
-          placeholder="Enter your email"
-          className={styles[variant].input}
-          value={formData.email}
-          onChange={(e) => setFormData((prev) => ({ ...prev, email: e.target.value }))}
-        />
-      </div>
-
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full">
         <input
           type="text"
           id="firstName"
@@ -128,13 +179,25 @@ export function SubscribeForm({ variant = 'hero' }: SubscribeFormProps) {
         />
       </div>
 
+      <div className="w-full">
+        <input
+          type="email"
+          id="email"
+          required
+          placeholder="Enter your email"
+          className={styles[variant].input}
+          value={formData.email}
+          onChange={(e) => setFormData((prev) => ({ ...prev, email: e.target.value }))}
+        />
+      </div>
+
       <div className="w-full relative">
         <select
           id="organizationSize"
           required
           className={styles[variant].select}
           value={formData.organizationSize || ''}
-          onChange={(e) => setFormData((prev) => ({ ...prev, organizationSize: e.target.value as OrganizationSize }))}
+          onChange={(e) => setFormData((prev) => ({ ...prev, organizationSize: e.target.value as Subscriber['organization_size'] }))}
           style={{ WebkitAppearance: 'none', MozAppearance: 'none' }}
         >
           <option value="" disabled className="text-gray-600">How big is your organisation (approx.)?</option>
@@ -162,7 +225,7 @@ export function SubscribeForm({ variant = 'hero' }: SubscribeFormProps) {
           <span className={`${variant === 'hero' ? 'text-white' : 'bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent'} font-semibold inline-flex items-center justify-center gap-2`}>
             {loading ? (
               <div className="flex items-center gap-2">
-                <span className="h-4 w-4 border-2 border-blue-600 border-r-transparent rounded-full animate-spin"></span>
+                <span className={`h-4 w-4 border-2 border-r-transparent rounded-full animate-spin ${variant === 'hero' ? 'border-white' : 'border-blue-600'}`}></span>
                 Please wait...
               </div>
             ) : (
@@ -174,14 +237,6 @@ export function SubscribeForm({ variant = 'hero' }: SubscribeFormProps) {
           </span>
         </button>
       </div>
-
-      <input
-        type="checkbox"
-        id="consent"
-        className="hidden"
-        checked={formData.consent}
-        onChange={(e) => setFormData((prev) => ({ ...prev, consent: e.target.checked }))}
-      />
     </form>
   );
 }

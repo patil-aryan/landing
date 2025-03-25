@@ -7,6 +7,8 @@ interface MailchimpMember {
   merge_fields?: {
     FNAME?: string;
     LNAME?: string;
+    JOBROLE?: string;
+    ORGSIZE?: string;
   };
 }
 
@@ -45,9 +47,11 @@ async function mailchimpFetch(endpoint: string, options: RequestInit = {}) {
 export async function addSubscriberToMailchimp(subscriber: Subscriber) {
   const member: MailchimpMember = {
     email_address: subscriber.email,
-    status: 'pending', // Uses double opt-in
+    status: 'subscribed', // Enable immediate email sending
     merge_fields: {
-      FNAME: subscriber.firstName || '',
+      FNAME: subscriber.first_name || '',
+      JOBROLE: subscriber.job_role || '',
+      ORGSIZE: subscriber.organization_size || '',
     },
   };
 
@@ -70,9 +74,11 @@ export async function addSubscriberToMailchimp(subscriber: Subscriber) {
 export async function updateSubscriberInMailchimp(subscriber: Subscriber) {
   const member: MailchimpMember = {
     email_address: subscriber.email,
-    status: 'pending',
+    status: 'subscribed',
     merge_fields: {
-      FNAME: subscriber.firstName || '',
+      FNAME: subscriber.first_name || '',
+      JOBROLE: subscriber.job_role || '',
+      ORGSIZE: subscriber.organization_size || '',
     },
   };
 
