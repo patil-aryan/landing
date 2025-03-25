@@ -1,7 +1,7 @@
 import { useState, FormEvent } from 'react';
 import { ArrowRight } from 'lucide-react';
 import { supabase } from '../lib/supabase';
-import { addSubscriberToMailchimp } from '../lib/mailchimp';
+import { addSubscriberToBrevo } from '../lib/brevo';
 import { toast } from 'sonner';
 import type { SubscribeFormData, Subscriber } from '../types/subscriber';
 
@@ -56,9 +56,9 @@ export function SubscribeForm({ variant = 'hero' }: SubscribeFormProps) {
           status: 'pending'
         };
 
-        await addSubscriberToMailchimp(subscriber);
+        await addSubscriberToBrevo(subscriber);
       } catch {
-        // Even if Mailchimp fails, we've saved to our DB, so don't throw
+        // Even if Brevo fails, we've saved to our DB, so don't throw
       }
 
       toast.success('Thank you for subscribing!', {
@@ -67,8 +67,8 @@ export function SubscribeForm({ variant = 'hero' }: SubscribeFormProps) {
           ? "bg-gradient-to-r from-blue-100/90 to-purple-100/90 border-2 border-green-500/20 text-gray-900 backdrop-blur" 
           : "bg-green-500/10 border border-green-500/20 text-white backdrop-blur",
         description: variant === 'hero'
-          ? <span className="text-white/80">We will update you soon with the beta access.</span>
-          : <span className="text-white/80">We will update you soon with the beta access.</span>,
+          ? <span className="text-white/80">Please check your email for a confirmation message.</span>
+          : <span className="text-white/80">Please check your email for a confirmation message.</span>,
       });
       setSuccess(true);
       setFormData({
@@ -78,7 +78,7 @@ export function SubscribeForm({ variant = 'hero' }: SubscribeFormProps) {
         organizationSize: undefined,
         consent: true,
       });
-    } catch (err) {
+      } catch (err: unknown) {
       const errorMessage = err instanceof Error ? err.message : 'An error occurred';
       toast.error(errorMessage, {
         duration: 5000,
