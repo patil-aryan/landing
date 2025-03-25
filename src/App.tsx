@@ -1,6 +1,6 @@
-import React from 'react';
-import { Sparkles, Puzzle, ArrowRight, Clock, Database, Timer, MessageSquareMore, FileSearch, Zap } from 'lucide-react';
-import { Toaster, toast } from 'sonner';
+
+import { Sparkles, Puzzle, Clock, Database, Timer, MessageSquareMore, FileSearch, Zap } from 'lucide-react';
+import { Toaster } from 'sonner';
 import { SubscribeForm } from './components/SubscribeForm';
 
 function App() {
@@ -194,9 +194,12 @@ function App() {
               Signup for Beta Access
             </span>
 
-            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-4 sm:mb-6 text-white leading-[1.15] sm:leading-tight px-4 sm:px-0">
-              Transform Your <span className="text-blue-200">Business Communication</span><br className="hidden sm:block" />
-              Into Strategic Success
+            <h2 className="text-[28px] sm:text-3xl lg:text-4xl xl:text-5xl font-bold text-white leading-tight sm:leading-[1.2] tracking-tight max-w-3xl mx-auto mb-6">
+              <div className="space-y-1 sm:space-y-2 md:space-y-3">
+                <div>Transform Your</div>
+                <div className="text-blue-200">Business Communication</div>
+                <div>Into Strategic Success</div>
+              </div>
             </h2>
             
             <p className="text-blue-100 text-sm sm:text-base mb-6 sm:mb-10 max-w-xl mx-auto px-4 sm:px-0">
